@@ -24,7 +24,7 @@ var machineID = generateMachineID()
 // readMachineID generates machine id and puts it into
 // the machineId Global varibale. If this function fails
 // to get the hostname, it will cause a runtime error.
-func generateMachineID() []byte {
+func generateMachineID() [3]byte {
 	var sum [3]byte // 3 byte Machine ID
 	id := sum[:]
 	hostname, err1 := os.Hostname()
@@ -35,13 +35,14 @@ func generateMachineID() []byte {
 		if err2 != nil {
 			panic(fmt.Errorf("Cannot get hostname: %v, %v", err1, err2))
 		}
-		return id
+		copy(sum[:], id)
+		return sum
 	}
 	hw := md5.New()
 	// append hostname to the running hash
 	hw.Write([]byte(hostname))
-	copy(id, hw.Sum(nil))
-	return id
+	copy(sum[:], hw.Sum(nil))
+	return sum
 }
 
 // New returns a new unique ObjectId.
@@ -54,13 +55,15 @@ func New() string {
 	// TimeStamp, 4 bytes, big endian.
 	binary.BigEndian.PutUint32(b[:], uint32(time.Now().Unix()))
 	// Machine, first 3 bytes of md5(hostname)
-	b[4] = machineID[0]
-	b[5] = machineID[1]
-	b[6] = machineID[2]
+	for i := 0; i < len(machineID); i++ {
+		b[4+i] = machineID[i]
+	}
+
 	// Pid, 2 bytes, specs don't specify endianness, but we use big endian
 	pid := os.Getegid()
 	b[7] = byte(pid >> 8)
 	b[8] = byte(pid)
+
 	// increment 3 bytes, big Endian
 	i := atomic.AddUint32(&objectIDCounter, 1)
 	b[9] = byte(i >> 16)
