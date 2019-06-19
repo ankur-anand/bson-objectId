@@ -17,3 +17,9 @@ func TestNew(t *testing.T) {
 		t.Errorf("Expected len of generated Object Id [%d] Got [%d]", 24, len(objectID))
 	}
 }
+
+func BenchmarkNew(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		New()
+	}
+}

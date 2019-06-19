@@ -17,6 +17,9 @@ import (
 // It's used as a counter part of an id.
 var objectIDCounter uint32
 
+// pid of the current running process
+var pid = os.Getegid()
+
 // machineId  is used to Strore machine id generated once will be used
 // in sebsequent calls.
 var machineID = generateMachineID()
@@ -60,7 +63,6 @@ func New() string {
 	}
 
 	// Pid, 2 bytes, specs don't specify endianness, but we use big endian
-	pid := os.Getegid()
 	b[7] = byte(pid >> 8)
 	b[8] = byte(pid)
 
