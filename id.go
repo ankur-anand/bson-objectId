@@ -18,7 +18,7 @@ import (
 var objectIDCounter uint32
 
 // pid of the current running process
-var pid = os.Getegid()
+var pid = os.Getpid()
 
 // machineId  is used to Strore machine id generated once will be used
 // in sebsequent calls.
