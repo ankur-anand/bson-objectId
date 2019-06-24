@@ -1,4 +1,4 @@
-package id
+package bsonid
 
 import (
 	"crypto/md5"
@@ -15,7 +15,13 @@ import (
 // objectIdCounter is atomically incremented when generating
 // a new Object Id using NewObjectId() function.
 // It's used as a counter part of an id.
-var objectIDCounter uint32
+var objectIDCounter = getRandomCounter()
+
+func getRandomCounter() uint32 {
+	counter := make([]byte, 4)
+	rand.Read(counter)
+	return binary.LittleEndian.Uint32(counter)
+}
 
 // pid of the current running process
 var pid = os.Getpid()
